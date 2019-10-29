@@ -1,13 +1,13 @@
 {
-    "name": "ngx-joyride",
-    "version": "3.0.0",
+    "name": "@chrosenau/ngx-joyride",
+    "version": "3.0.1",
     "description": "Angular Joyride/Tour Library",
     "main": "./bundles/ngx-joyride.umd.js",
     "jsnext:main": "./esm5/ngx-joyride.esm.js",
     "module": "./esm5/ngx-joyride.esm.js",
     "es2015": "./esm2015/ngx-joyride.esm2015.js",
     "typings": "./joyride.d.ts",
-    "author": "Nicola Tommasi",
+    "author": "Christian Rosenau",
     "repository": {
         "type": "git",
         "url": "https://github.com/crosenau/ngx-joyride"
