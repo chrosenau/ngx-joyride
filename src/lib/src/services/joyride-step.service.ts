@@ -122,8 +122,10 @@ export class JoyrideStepService implements IJoyrideStepService {
     }
 
     private tryShowStep(actionType: StepActionType) {
-        this.navigateToStepPage(actionType).then(success => {
-            if (success) {
+        this.navigateToStepPage(actionType).then(() => {
+            const timeout = this.optionsService.getWaitingTime();
+            if (timeout > 100) this.backDropService.remove();
+            setTimeout(() => {
                 try {
                     this.showStep(actionType);
                 } catch (error) {
@@ -136,10 +138,9 @@ export class JoyrideStepService implements IJoyrideStepService {
                         throw new Error(error);
                     }
                 }
-            } else {
-                this.logger.error('Forcing the tour closure: Navigation failed.');
-                this.close();
-            }
+            }, timeout);
+        }, error => {
+            throw new Error(error);
         });
     }
 
