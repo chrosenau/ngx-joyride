@@ -105,11 +105,12 @@ export class JoyrideStepService implements IJoyrideStepService {
         this.tryShowStep(StepActionType.NEXT);
     }
 
-    private navigateToStepPage(action: StepActionType) {
+    private navigateToStepPage(action: StepActionType): Promise<boolean> {
         let stepRoute = this.stepsContainerService.getStepRoute(action);
         if (stepRoute) {
-            this.router.navigate([stepRoute]);
+            return this.router.navigate([stepRoute]);
         }
+        return Promise.resolve(true);
     }
 
     private subscribeToStepsUpdates() {
@@ -121,23 +122,25 @@ export class JoyrideStepService implements IJoyrideStepService {
     }
 
     private tryShowStep(actionType: StepActionType) {
-        this.navigateToStepPage(actionType);
-        const timeout = this.optionsService.getWaitingTime();
-        if (timeout > 100) this.backDropService.remove();
-        setTimeout(() => {
-            try {
-                this.showStep(actionType);
-            } catch (error) {
-                if (error instanceof JoyrideStepDoesNotExist) {
-                    this.tryShowStep(actionType);
-                } else if (error instanceof JoyrideStepOutOfRange) {
-                    this.logger.error('Forcing the tour closure: First or Last step not found in the DOM.');
-                    this.close();
-                } else {
-                    throw new Error(error);
+        this.navigateToStepPage(actionType).then(success => {
+            if (success) {
+                try {
+                    this.showStep(actionType);
+                } catch (error) {
+                    if (error instanceof JoyrideStepDoesNotExist) {
+                        this.tryShowStep(actionType);
+                    } else if (error instanceof JoyrideStepOutOfRange) {
+                        this.logger.error('Forcing the tour closure: First or Last step not found in the DOM.');
+                        this.close();
+                    } else {
+                        throw new Error(error);
+                    }
                 }
+            } else {
+                this.logger.error('Forcing the tour closure: Navigation failed.');
+                this.close();
             }
-        }, timeout);
+        });
     }
 
     private showStep(actionType: StepActionType) {
